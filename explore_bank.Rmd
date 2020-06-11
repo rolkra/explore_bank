@@ -1,0 +1,106 @@
+---
+title: "explore_bank"
+author: "R. Krasser"
+date: "18 Mai 2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+
+library(tidyverse)
+library(explore)
+```
+
+## Dataset
+
+Using Bank Marketing Dataset from https://archive.ics.uci.edu/ml/datasets/bank+marketing
+
+This dataset is public available for research. The details are described in [Moro et al., 2014].
+
+[Moro et al., 2014] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict the Success of Bank Telemarketing. Decision Support Systems, Elsevier, 62:22-31, June 2014
+
+The target-variable is called "y" - has the client subscribed a term deposit? (binary: 'yes','no')
+
+## Read Data
+
+```{r}
+data <- readr::read_delim("bank-additional.csv", 
+                   ";", escape_double = FALSE, trim_ws = TRUE)
+
+data %>% describe_tbl(target = y)
+```
+
+```{r}
+data %>% describe()
+```
+
+## Data Exploration
+
+```{r fig.height=total_fig_height(data)}
+data %>% 
+  explore_all()
+```
+
+## Data Understanding
+
+```{r}
+data %>% explore(age)
+```
+
+```{r}
+data %>% describe(age)
+```
+
+So, there are customer with age between 18 and 88, the median is 35 years. There is a "peak" at age 30-35. No customer with unknown age.
+
+```{r}
+data %>% explore(marital)
+```
+
+60.9% of customers are married, 28% single.
+
+```{r}
+data %>% explore(age, marital)
+```
+
+There is a pattern between age and marital. Singles have lowest age.
+
+```{r}
+data %>% explore(job)
+```
+
+```{r}
+data %>% explore(age, job)
+```
+
+```{r}
+data %>% explore(education)
+```
+
+## Data+Target Exploration
+
+```{r fig.height=total_fig_height(data)}
+data %>% 
+  explore_all(target = y, split = FALSE)
+```
+
+## Predit Target
+
+```{r}
+data %>% explore(y)
+```
+
+In the data are 10.9 cases with y = "yes"
+
+```{r}
+data %>% explain_tree(target = y, minsplit = 300, maxdepth = 4)
+```
+
